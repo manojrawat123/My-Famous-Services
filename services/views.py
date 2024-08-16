@@ -9,7 +9,6 @@ from rest_framework import status
 class ServiceApiView(APIView):
     def get(self, request, slug = None):
         try:
-            # Get One Service
             if slug is not None:
                 try:
                     service = MyService.objects.get(slug = slug)
@@ -17,18 +16,14 @@ class ServiceApiView(APIView):
                     return Response(service_serializer.data, status=status.HTTP_200_OK)
                 except Exception as e:
                     return Response({"error" : "Service Not Found"}, status=status.HTTP_404_NOT_FOUND)
-
-            # Get All Services
-            service = MyService.objects.filter(active = True)
-            service_serializer = MyDetailsSerialzer(service, many = True)
-            return Response({
-                "service" : service_serializer.data,
-                "length" : len(service)
-                },
-            status=status.HTTP_200_OK)
+            else:
+                service = MyService.objects.filter(active = True)
+                service_serializer = MyDetailsSerialzer(service, many = True)
+                return Response({
+                    "service" : service_serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({"error" : "Internal Server Error"})
+            return Response({"error" : "Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, id = None):
         try:
@@ -43,7 +38,7 @@ class ServiceApiView(APIView):
                     return Response(service_serialzer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)
-            return Response({"error" : "Internal Server Error"})
+            return Response({"error" : "Internal Server Error"}, status=500)
         
     def put(self, request, slug = None):
         if slug is not None:
