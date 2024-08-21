@@ -13,7 +13,15 @@ class ServiceApiView(APIView):
                 try:
                     service = MyService.objects.get(slug = slug)
                     service_serializer = MyDetailsSerialzer(service)
-                    return Response(service_serializer.data, status=status.HTTP_200_OK)
+
+                    # 
+                    ten_service = MyService.objects.filter(active = True)[0: 10]
+                    ten_service_serializer = MyDetailsSerialzer(ten_service, many = True)
+                    
+                    return Response({
+                        "service" : service_serializer.data,
+                        "suggested_service" : ten_service_serializer.data
+                        }, status=status.HTTP_200_OK)
                 except Exception as e:
                     return Response({"error" : "Service Not Found"}, status=status.HTTP_404_NOT_FOUND)
             else:
